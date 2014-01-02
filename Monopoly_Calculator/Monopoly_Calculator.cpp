@@ -12,11 +12,11 @@ using namespace std;
 void greeting();
 void Functions();
 int dieRoll();
-int CalcCurrentSpot(int die1,int die2,int CurrentSpot);
 int Chance(int CurrentSpot);
 int Chest(int CurrentSpot);
 void CalcOutput(int LandedOn[],int EndedOn[],int NumberOfTurns);
 
+const int NUMBER_OF_TILES = 41;
 enum TileNames {Start, Mediterranean_Avenue, Community_Chest1, Baltic_Avenue, Income_Tax, Reading_Railroad, Orientel_Avenue, Chance1, Vermont_Avenue, Connecticut_Avenue,
 					Jail_Visiting, Charles_Place, Electric_Company, States_Avenue, Virginia_Avenue, Pennsylvania_Railroad, James_Place, Community_Chest2, Tennessee_Avenue, Newyork_Avenue,
 					Free_Parking, Kentucky_avenue, Chance2, Indiana_Avenue, Illinois_Avenue, BandO_Railroad, Atlantic_Avenue, Ventnor_Avenue, Water_Works, Marvin_Gardens,
@@ -40,11 +40,14 @@ void greeting()
 
 void Functions()
 {
-	int LandedOn[40];
-	int EndedOn[40];
+	int LandedOn[NUMBER_OF_TILES];
+	int EndedOn[NUMBER_OF_TILES];
 	int NumberOfTurns = 0, CurrentSpot = 0;
+	int die1;
+	int die2;
+	int doubleCount;
 
-	for(int i = 0; i < 40; i++)
+	for(int i = 0; i < NUMBER_OF_TILES; i++)
 	{
 		LandedOn[i] = 0;
 		EndedOn[i] = 0;
@@ -54,27 +57,30 @@ void Functions()
 	
 	cout << "Please enter the number of turns :";	
 	cin >> NumberOfTurns;
+
 	for (int i = 0; i < 11; i++)
 	{
-		for (int i = 0; i < (NumberOfTurns / 10); i++)
+		for (int j = 0; j < (NumberOfTurns / 10); j++)
 		{
-			int die1;
-			int die2;
-			int doubleCount = 0;
+			doubleCount = 0;
 			do {
-				die1 = dieRoll();
-				die2 = dieRoll();
-				if (CurrentSpot == 41)
+				if (CurrentSpot == In_Jail)
 				{
-					CurrentSpot = 10;
+					CurrentSpot = 10; //get out of jail (by paying $50)
 				}
-				else if (doubleCount >= 3)
+				die1 = rand()%6 + 1;
+				die2 = rand()%6 + 1;
+				if (die1 == die2)
 				{
-					CurrentSpot = 41; //goto jail
+					doubleCount++;
+				}
+				if (doubleCount >= 3)
+				{
+					CurrentSpot = In_Jail; //goto jail
 				}
 				else
 				{
-					CurrentSpot = CalcCurrentSpot(die1, die2,CurrentSpot);
+					CurrentSpot = (die1 + die2 + CurrentSpot) % 40; //Adds dice and makes sure currentspot goes around the board
 					LandedOn[CurrentSpot]++;
 					if (( CurrentSpot == 7) || (CurrentSpot == 22) || (CurrentSpot == 36))
 					{
@@ -84,36 +90,22 @@ void Functions()
 					{
 						CurrentSpot = Chest(CurrentSpot); // ADD CHEST FUNCTION
 					}
+					else if (CurrentSpot == Go_To_Jail)
+					{
+						CurrentSpot = In_Jail;
+					}
 				}
 				EndedOn[CurrentSpot]++;
-				doubleCount++;
-			} while (die1 == die2);
+			} while ((die1 == die2) && (CurrentSpot != In_Jail));
 		}
 		cout << i * 10 << "% calculated!" << endl;
 	}
 	CalcOutput(LandedOn, EndedOn, NumberOfTurns);
 }
 
-int dieRoll()
-{
-	int randomNumber = 0;
-	randomNumber = (rand()%6)+1;
-	return randomNumber;
-}
-
-int CalcCurrentSpot(int die1,int die2, int CurrentSpot)
-{
-	CurrentSpot = CurrentSpot + die1 + die2;
-		if (CurrentSpot > 39)
-		{
-			CurrentSpot -= 40;
-		}
-	return CurrentSpot;
-}
-
 int Chance(int CurrentSpot)
 {
-	int randCard = (rand()%15);
+	int randCard = (rand()%16);
 	if (randCard <= 5)
 	{
 		//Do Nothing
@@ -127,42 +119,23 @@ int Chance(int CurrentSpot)
 			CurrentSpot = 5;
 		break;
 		case 8: // Go to Nearest RailRoad
+		case 9: //OTher go to nearest railroad card
 			if ((CurrentSpot < 5) || (CurrentSpot >= 35)) // Go to Reading Railroad
 			{
-				CurrentSpot = 5;
+				CurrentSpot = Reading_Railroad;
 			}
 			else if (CurrentSpot < 15) // Go to Pennsylvania RailRoad
 			{
-				CurrentSpot = 15;
+				CurrentSpot = Pennsylvania_Railroad;
 			}
 			else if (CurrentSpot < 25) // Go to b & o RailRoad
 			{
-				CurrentSpot = 25;
+				CurrentSpot = BandO_Railroad;
 			}
 			else if (CurrentSpot < 35) // Go to ShortLine
 			{
-				CurrentSpot = 35;
+				CurrentSpot = Short_Line;
 			}
-			CurrentSpot = 11;
-		break;
-		case 9: // Go to Nearest RailRoad
-			if ((CurrentSpot < 5) || (CurrentSpot >= 35)) // Go to Reading Railroad
-			{
-				CurrentSpot = 5;
-			}
-			else if (CurrentSpot < 15) // Go to Pennsylvania RailRoad
-			{
-				CurrentSpot = 15;
-			}
-			else if (CurrentSpot < 25) // Go to b & o RailRoad
-			{
-				CurrentSpot = 25;
-			}
-			else if (CurrentSpot < 35) // Go to ShortLine
-			{
-				CurrentSpot = 35;
-			}
-			CurrentSpot = 11;
 		break;
 		case 10: // Go to Go
 			CurrentSpot = 0;
@@ -174,7 +147,7 @@ int Chance(int CurrentSpot)
 			CurrentSpot = 39;
 		break;
 		case 13: // Go to Nearest Utility
-			if ((CurrentSpot < 12) || (CurrentSpot > 28)) //Goto Electric Company
+			if ((CurrentSpot < 12) || (CurrentSpot >= 28)) //Goto Electric Company
 			{
 				CurrentSpot = 12;
 			}
@@ -184,10 +157,10 @@ int Chance(int CurrentSpot)
 			}
 		break;
 		case 14: // Go to Jail
-			CurrentSpot = 41;
+			CurrentSpot = In_Jail;
 		break;
 		case 15: // Go back 3 spaces
-			CurrentSpot = CurrentSpot - 3;
+			CurrentSpot -= 3;
 		break;
 	}
 	return CurrentSpot;
@@ -195,14 +168,14 @@ int Chance(int CurrentSpot)
 
 int Chest(int CurrentSpot)
 {
-	int randCard = (rand()%15);
+	int randCard = (rand()%16);
 	if (randCard < 14)
 	{
 		//Do Nothing
 	}
 	else if (randCard = 14)
 	{
-		CurrentSpot = 41; //go to jail
+		CurrentSpot = In_Jail; //go to jail
 	}
 	else if (randCard = 15)
 	{
@@ -220,7 +193,7 @@ void CalcOutput(int LandedOn[],int EndedOn[],int NumberOfTurns)
 	cout.setf(ios::fixed);
 	cout.setf(ios::showpoint);
 	cout.precision(4);
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < NUMBER_OF_TILES; i++)
 	{
 		Percent = EndedOn[i];
 		Percent /= NumberOfTurns;
