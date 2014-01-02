@@ -5,7 +5,8 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include <ctime> 
+#include <ctime>
+#include <iomanip>
 
 using namespace std;
 
@@ -17,11 +18,16 @@ int Chest(int CurrentSpot);
 void CalcOutput(int LandedOn[],int EndedOn[],int NumberOfTurns);
 
 const int NUMBER_OF_TILES = 41;
-enum TileNames {Start, Mediterranean_Avenue, Community_Chest1, Baltic_Avenue, Income_Tax, Reading_Railroad, Orientel_Avenue, Chance1, Vermont_Avenue, Connecticut_Avenue,
+enum Tiles {Start, Mediterranean_Avenue, Community_Chest1, Baltic_Avenue, Income_Tax, Reading_Railroad, Orientel_Avenue, Chance1, Vermont_Avenue, Connecticut_Avenue,
 					Jail_Visiting, Charles_Place, Electric_Company, States_Avenue, Virginia_Avenue, Pennsylvania_Railroad, James_Place, Community_Chest2, Tennessee_Avenue, Newyork_Avenue,
 					Free_Parking, Kentucky_avenue, Chance2, Indiana_Avenue, Illinois_Avenue, BandO_Railroad, Atlantic_Avenue, Ventnor_Avenue, Water_Works, Marvin_Gardens,
 					Go_To_Jail, Pacific_Avenue, North_Carolina_Avenue, Community_Chest3, Pensylvania_Avenue, Short_Line, Chance3, Park_Place, Luxury__Tax, BoardWalk,
 					In_Jail};
+string TileNames[] = {"Start", "Mediterranean_Avenue", "Community_Chest1", "Baltic_Avenue", "Income_Tax", "Reading_Railroad", "Orientel_Avenue", "Chance1", "Vermont_Avenue", "Connecticut_Avenue",
+					"Jail_Visiting", "Charles_Place", "Electric_Company", "States_Avenue", "Virginia_Avenue", "Pennsylvania_Railroad", "James_Place", "Community_Chest2", "Tennessee_Avenue", "Newyork_Avenue",
+					"Free_Parking", "Kentucky_avenue", "Chance2", "Indiana_Avenue", "Illinois_Avenue", "BandO_Railroad", "Atlantic_Avenue", "Ventnor_Avenue", "Water_Works", "Marvin_Gardens",
+					"Go_To_Jail", "Pacific_Avenue", "North_Carolina_Avenue", "Community_Chest3", "Pensylvania_Avenue", "Short_Line", "Chance3", "Park_Place", "Luxury__Tax", "BoardWalk",
+					"In_Jail"};
 
 int main()
 {
@@ -189,7 +195,7 @@ void CalcOutput(int LandedOn[],int EndedOn[],int NumberOfTurns)
 	double Percent = 0;
 	system("Pause");
 	system("cls");
-	cout << "Name of space\tTimes Landed On\tTimes Ended On\tPercentage Rate" << endl;
+	cout << "Name of space            Times Landed On Times Ended On Percentage Rate" << endl;
 	cout.setf(ios::fixed);
 	cout.setf(ios::showpoint);
 	cout.precision(4);
@@ -198,7 +204,12 @@ void CalcOutput(int LandedOn[],int EndedOn[],int NumberOfTurns)
 		Percent = EndedOn[i];
 		Percent /= NumberOfTurns;
 		Percent *= 100;
-		cout << TileNames(i) << "\t\t" << LandedOn[i] << "\t\t" << EndedOn[i] << "\t\t" << Percent << endl;
+		cout << "-------------------------------------------------------------------------\n";
+		//cout << TileNames[i] << "\t\t" << LandedOn[i] << "\t\t" << EndedOn[i] << "\t\t" << Percent << endl;
+		cout << setw(25) << left << TileNames[i]
+			 << setw(16) << LandedOn[i]
+			 << setw(15) << EndedOn[i]
+			 << setw(15) << Percent << endl;
 	}
 	system("Pause");
 }
